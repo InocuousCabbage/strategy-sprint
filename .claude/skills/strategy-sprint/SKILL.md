@@ -1,6 +1,6 @@
 ---
 name: strategy-sprint
-description: "Top-level Strategy Sprint orchestrator. Runs an 8-skill marketing strategy sprint against a per-client artifact folder — company-overview, ICP prioritization, marketing advantages, perceptions, positioning, revenue levers, big-bet campaigns, and brand voice. Reads client input from artifacts/<client>/input/, produces strategy sections in artifacts/<client>/output/. Extracted from marketing-agent-team; standalone + portable."
+description: "Top-level Strategy Sprint orchestrator. Runs an 8-skill marketing strategy sprint against a per-client artifact folder: company-overview, ICP prioritization, marketing advantages, perceptions, positioning, revenue levers, big-bet campaigns, and brand voice. Reads client input from artifacts/<client>/input/, produces strategy sections in artifacts/<client>/output/. Standalone + portable."
 metadata:
   version: 1.0.0
 ---
@@ -120,4 +120,4 @@ After a full sprint, the operator should be able to:
 ## Related skills
 
 - Each of the 9 individual exercise skills at `.claude/skills/<exercise>/SKILL.md`.
-- Source lineage: extracted 2026-07-27 from `marketing-agent-team/orgs/lever/agents/boss/.claude/skills/` (7 exercises, joined 2026-08-05 by channel-strategy from the same directory) and `marketing-agent-team/templates/content-creator/.claude/skills/brand-voice/` (brand-voice). Marketing-agent-team-specific paths were rewritten to the `${ARTIFACT_DIR}` per-client convention. See README for the extraction discipline.
+- Source lineage: extracted 2026-07-27 from a private multi-agent marketing framework, 7 exercises from one agent's skills directory, joined 2026-08-05 by channel-strategy from the same directory, plus brand-voice from a content-creator agent template. Framework-specific paths were rewritten to the `${ARTIFACT_DIR}` per-client convention. See README for the extraction discipline.

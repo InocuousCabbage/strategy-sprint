@@ -1,6 +1,6 @@
 # Strategy Sprint
 
-A standalone Claude Code skills repo that runs Emily Kramer-inspired Strategy Sprint exercises against any client. Extracted from [`marketing-agent-team`](https://github.com/InocuousCabbage/marketing-agent-team) 2026-07-27 as a portable, orchestrator-driven, per-client workflow.
+A standalone Claude Code skills repo that runs Emily Kramer-inspired Strategy Sprint exercises against any client. Extracted 2026-07-27 from a private multi-agent marketing framework, as a portable, orchestrator-driven, per-client workflow.
 
 The sprint takes ~3-5 hours end-to-end with a knowledgeable operator and produces a complete marketing strategy document (positioning, ICP, revenue levers, big-bet campaigns, brand voice, etc.) for one client.
 
@@ -88,7 +88,7 @@ Skipping earlier phases breaks downstream context. If the client already has som
 
 ## Design notes
 
-- **Standalone + portable.** Skills reference `${ARTIFACT_DIR}` as their per-client root. No `marketing-agent-team`-specific paths remain.
+- **Standalone + portable.** Skills reference `${ARTIFACT_DIR}` as their per-client root. No framework-specific paths remain.
 - **Product + competitors are NOT standalone skills.** They live as SECTIONS within `/company-overview` (product) and `/positioning` (competitors), matching how the source Sprint methodology structures them. Adding standalone product/competitors skills would duplicate work already covered.
 - **Not fully autonomous.** Every exercise pauses at Step 4 for operator/client confirmation. This is a human-in-the-loop workflow, not a fire-and-forget agent.
 - **The 7-exercise methodology comes from Emily Kramer's MKT1 framework.** This repo is a Claude-Code-native re-implementation for personal / small-team consulting use.
@@ -99,6 +99,6 @@ Skipping earlier phases breaks downstream context. If the client already has som
 
 ## Lineage
 
-- Extracted 2026-07-27 from `marketing-agent-team/orgs/lever/agents/boss/.claude/skills/` (7 exercises; channel-strategy followed 2026-08-05 from the same directory) and `marketing-agent-team/templates/content-creator/.claude/skills/brand-voice/` (brand-voice).
+- Extracted 2026-07-27 from a private multi-agent marketing framework: 7 exercises from one agent's skills directory, joined 2026-08-05 by channel-strategy from the same directory, plus brand-voice from a content-creator agent template.
 - Marketing-agent-team-specific paths (`contexts/*.md`, `.claude/skills/marketing-strategy/`, `USER.md`, `tasks/strategy/`) rewritten to the `${ARTIFACT_DIR}` per-client convention.
-- Extraction was read-only on marketing-agent-team; source was not modified.
+- Extraction was read-only on the source framework; the source was not modified.
