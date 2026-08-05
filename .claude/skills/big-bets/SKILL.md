@@ -1,6 +1,6 @@
 ---
 name: big-bets
-description: "Strategy Sprint Exercise 7: Big Bet Campaigns. Defines 1-3 major campaigns for the next quarter that bring the strategy to life — with specific audience, fuel, engine, goals, and timelines. Output is automatically saved to the /marketing-strategy skill."
+description: "Strategy Sprint Exercise 8: Big Bet Campaigns. Defines 1-3 major campaigns for the next quarter that bring the strategy to life, with specific audience, fuel, engine, goals, and timelines. Output is automatically saved to the /marketing-strategy skill."
 metadata:
   version: 1.0.0
 ---
@@ -31,6 +31,9 @@ This exercise is where all prior Strategy Sprint work comes together into action
   - Perceptions (what stories to tell)
   - Positioning (how to frame it)
   - Revenue Levers (where to invest)
+  - Channel Strategy (where to run it, and what the budget allows)
+
+The Engine of each campaign below must come from the Primary or Secondary tiers in Channel Strategy. If a campaign needs a channel that exercise deprioritized, that is a disagreement between two exercises, so raise it rather than shipping both.
 
 ## Step 1: Research
 

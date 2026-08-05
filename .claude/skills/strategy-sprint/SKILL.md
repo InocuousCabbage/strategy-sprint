@@ -7,7 +7,7 @@ metadata:
 
 # Strategy Sprint Orchestrator
 
-You are running a complete Strategy Sprint for a client. This orchestrator chains the 7 core Sprint exercises + 1 companion brand-voice skill, producing a full marketing strategy document with per-client customization.
+You are running a complete Strategy Sprint for a client. This orchestrator chains the 8 core Sprint exercises + 1 companion brand-voice skill, producing a full marketing strategy document with per-client customization.
 
 ## Per-Client Artifact Folder Convention
 
@@ -45,16 +45,17 @@ The orchestrator will:
 1. Verify `artifacts/<client-slug>/input/client-brief.md` exists (fail loud if not — the client brief is the single source of truth for the run).
 2. Create `artifacts/<client-slug>/output/` if it doesn't exist, seed `marketing-strategy.md` from the template if new.
 3. Set `ARTIFACT_DIR=artifacts/<client-slug>` for the run.
-4. Execute the 7 core exercises in order (each writes its section to `output/marketing-strategy.md`):
+4. Execute the 8 core exercises in order (each writes its section to `output/marketing-strategy.md`):
    - Phase 1: `/company-overview`
    - Phase 2: `/icp-prioritization`
    - Phase 3: `/marketing-advantages`
    - Phase 4: `/perceptions`
    - Phase 5: `/positioning`
    - Phase 6: `/revenue-levers`
-   - Phase 7: `/big-bets`
+   - Phase 7: `/channel-strategy`
+   - Phase 8: `/big-bets`
 5. Execute the companion `/brand-voice` skill last, populating `artifacts/<client-slug>/output/brand-voice.md` from either the client's `input/brand-voice.md` override or the built-in defaults.
-6. Read back `output/marketing-strategy.md` to confirm all 7 sections are populated (no `*Not yet completed.*` placeholders remain).
+6. Read back `output/marketing-strategy.md` to confirm all 8 sections are populated (no `*Not yet completed.*` placeholders remain).
 7. Announce completion + summarize what was produced.
 
 ### Single-phase mode
@@ -111,12 +112,12 @@ Do not create standalone product or competitors skills. They are already covered
 
 After a full sprint, the operator should be able to:
 
-1. Read `artifacts/<client-slug>/output/marketing-strategy.md` end-to-end and see all 7 sprint sections populated with client-specific content (not `*Not yet completed.*` placeholders).
+1. Read `artifacts/<client-slug>/output/marketing-strategy.md` end-to-end and see all 8 sprint sections populated with client-specific content (not `*Not yet completed.*` placeholders).
 2. Find deeper per-topic files at `output/product.md`, `output/icp.md`, `output/competitors.md`.
 3. Find one file per big-bet campaign in `output/campaigns/`.
 4. Find `output/brand-voice.md` with either the client's overrides or the defaults from `brand-voice/SKILL.md`.
 
 ## Related skills
 
-- Each of the 8 individual exercise skills at `.claude/skills/<exercise>/SKILL.md`.
-- Source lineage: extracted 2026-07-27 from `marketing-agent-team/orgs/lever/agents/boss/.claude/skills/` (7 exercises) and `marketing-agent-team/templates/content-creator/.claude/skills/brand-voice/` (brand-voice). Marketing-agent-team-specific paths were rewritten to the `${ARTIFACT_DIR}` per-client convention. See README for the extraction discipline.
+- Each of the 9 individual exercise skills at `.claude/skills/<exercise>/SKILL.md`.
+- Source lineage: extracted 2026-07-27 from `marketing-agent-team/orgs/lever/agents/boss/.claude/skills/` (7 exercises, joined 2026-08-05 by channel-strategy from the same directory) and `marketing-agent-team/templates/content-creator/.claude/skills/brand-voice/` (brand-voice). Marketing-agent-team-specific paths were rewritten to the `${ARTIFACT_DIR}` per-client convention. See README for the extraction discipline.

@@ -10,7 +10,7 @@ Eight skills, chained by the top-level orchestrator:
 
 | Skill | Purpose |
 |-------|---------|
-| `strategy-sprint` | Top-level orchestrator. Chains all 7 exercises + brand-voice against one client. |
+| `strategy-sprint` | Top-level orchestrator. Chains all 8 exercises + brand-voice against one client. |
 | `company-overview` | Exercise 1. Foundational company context, product, metrics, differentiators. |
 | `icp-prioritization` | Exercise 2. Prioritized ICP tiers (Core / Scaling / Testing / Not a Priority). |
 | `marketing-advantages` | Exercise 3. Unfair marketing advantages across MKT1 categories. |
@@ -39,7 +39,7 @@ Invoke the orchestrator with the client slug:
 The orchestrator:
 1. Verifies `artifacts/acme/input/client-brief.md` exists.
 2. Sets `ARTIFACT_DIR=artifacts/acme` for the run.
-3. Runs the 7 exercises in dependency order, each pausing for operator/client confirmation before saving.
+3. Runs the 8 exercises in dependency order, each pausing for operator/client confirmation before saving.
 4. Runs `/brand-voice` last, applying `input/brand-voice.md` overrides if present.
 5. Verifies `output/marketing-strategy.md` has no `*Not yet completed.*` placeholders left.
 
@@ -99,6 +99,6 @@ Skipping earlier phases breaks downstream context. If the client already has som
 
 ## Lineage
 
-- Extracted 2026-07-27 from `marketing-agent-team/orgs/lever/agents/boss/.claude/skills/` (7 exercises) and `marketing-agent-team/templates/content-creator/.claude/skills/brand-voice/` (brand-voice).
+- Extracted 2026-07-27 from `marketing-agent-team/orgs/lever/agents/boss/.claude/skills/` (7 exercises; channel-strategy followed 2026-08-05 from the same directory) and `marketing-agent-team/templates/content-creator/.claude/skills/brand-voice/` (brand-voice).
 - Marketing-agent-team-specific paths (`contexts/*.md`, `.claude/skills/marketing-strategy/`, `USER.md`, `tasks/strategy/`) rewritten to the `${ARTIFACT_DIR}` per-client convention.
 - Extraction was read-only on marketing-agent-team; source was not modified.

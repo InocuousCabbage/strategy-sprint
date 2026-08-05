@@ -1,6 +1,6 @@
 # Marketing Strategy — Example Client
 
-> This is the master strategy document. Each of the 7 Sprint exercises writes its section here as it runs. Before the Sprint, every section reads `*Not yet completed.*`. After the Sprint, every section has client-confirmed content.
+> This is the master strategy document. Each of the 8 Sprint exercises writes its section here as it runs. Before the Sprint, every section reads `*Not yet completed.*`. After the Sprint, every section has client-confirmed content.
 >
 > The orchestrator (`/strategy-sprint <client-slug>`) verifies at completion that no `*Not yet completed.*` placeholders remain. Individual `/exercise-name` invocations update ONE section without touching the others.
 
@@ -82,6 +82,20 @@ Populated by: `/positioning`
 - Recommended strategies per top lever
 
 Populated by: `/revenue-levers`
+
+---
+
+## Channel Strategy
+*Not yet completed.*
+
+### What Goes Here
+
+- Tiered channel list (Primary / Secondary / Experimental / Deprioritized) with weighted score per channel
+- Per-channel rationale, budget allocation %, key metrics, and owner
+- Budget summary table across tiers
+- Scoring detail across the four dimensions (audience fit, cost efficiency, team capability, competitive advantage)
+
+Populated by: `/channel-strategy`
 
 ---
 
