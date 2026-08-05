@@ -52,6 +52,7 @@ The orchestrator will:
    - Phase 4: `/perceptions`
    - Phase 5: `/positioning`
    - Phase 6: `/revenue-levers`
+   - Before Phase 7: `/tool-inventory` (prerequisite, not a numbered exercise; establishes what the client can actually execute with, which Phase 7 scores against)
    - Phase 7: `/channel-strategy`
    - Phase 8: `/big-bets`
 5. Execute the companion `/brand-voice` skill last, populating `artifacts/<client-slug>/output/brand-voice.md` from either the client's `input/brand-voice.md` override or the built-in defaults.
@@ -119,5 +120,5 @@ After a full sprint, the operator should be able to:
 
 ## Related skills
 
-- Each of the 9 individual exercise skills at `.claude/skills/<exercise>/SKILL.md`.
+- Each of the 9 individual exercise skills at `.claude/skills/<exercise>/SKILL.md`, plus the `/tool-inventory` prerequisite.
 - Source lineage: extracted 2026-07-27 from a private multi-agent marketing framework, 7 exercises from one agent's skills directory, joined 2026-08-05 by channel-strategy from the same directory, plus brand-voice from a content-creator agent template. Framework-specific paths were rewritten to the `${ARTIFACT_DIR}` per-client convention. See README for the extraction discipline.
