@@ -45,7 +45,14 @@ The orchestrator will:
 1. Verify `artifacts/<client-slug>/input/client-brief.md` exists (fail loud if not — the client brief is the single source of truth for the run).
 2. Create `artifacts/<client-slug>/output/` if it doesn't exist, seed `marketing-strategy.md` from the template if new.
 3. Set `ARTIFACT_DIR=artifacts/<client-slug>` for the run.
-4. Execute the 8 core exercises in order (each writes its section to `output/marketing-strategy.md`):
+4. **Create `output/sprint-manifest.yaml` if it does not exist, listing EVERY step with `status: unrun`.** Conform to `schema/strategy_sprint_input.schema.json`. The manifest is the entry point a consumer reads first, and it must exist from the start of the run rather than being assembled at the end.
+
+   Every step gets an entry immediately, including the ones that have not run: `exerciseId`, `order`, `required`, `status: unrun`, `sidecarPath`, and `completedAt: null`. Each exercise then updates its own row as it completes.
+
+   **Why the full list up front, and not just the steps that finish.** A sidecar that was never written cannot report that it was expected. If unrun steps were simply absent, a sprint that stopped halfway and a manifest that is merely stale would look identical, and a consumer would read the second as the first. Listing every step is the only thing that keeps "not run yet" distinguishable from "ran and wrote nothing". Do not prune entries to tidy the file.
+
+   If the manifest already exists, leave it alone and let each exercise update its own row. Regenerating it mid-sprint would reset completed steps to `unrun` and silently discard the run's history.
+5. Execute the 8 core exercises in order (each writes its section to `output/marketing-strategy.md`):
    - Phase 1: `/company-overview`
    - Phase 2: `/icp-prioritization`
    - Phase 3: `/marketing-advantages`
@@ -55,9 +62,9 @@ The orchestrator will:
    - Before Phase 7: `/tool-inventory` (prerequisite, not a numbered exercise; establishes what the client can actually execute with, which Phase 7 scores against)
    - Phase 7: `/channel-strategy`
    - Phase 8: `/big-bets`
-5. Execute the companion `/brand-voice` skill last, populating `artifacts/<client-slug>/output/brand-voice.md` from either the client's `input/brand-voice.md` override or the built-in defaults.
-6. Read back `output/marketing-strategy.md` to confirm all 8 sections are populated (no `*Not yet completed.*` placeholders remain).
-7. Announce completion + summarize what was produced.
+6. Execute the companion `/brand-voice` skill last, populating `artifacts/<client-slug>/output/brand-voice.md` from either the client's `input/brand-voice.md` override or the built-in defaults.
+7. Read back `output/marketing-strategy.md` to confirm all 8 sections are populated (no `*Not yet completed.*` placeholders remain).
+8. Announce completion + summarize what was produced.
 
 ### Single-phase mode
 

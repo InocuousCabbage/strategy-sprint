@@ -52,10 +52,12 @@ def test_every_exercise_id_has_a_skill():
 
 @pytest.mark.xfail(
     strict=True,
-    reason="KNOWN GAP 2026-08-05: only tool-inventory writes a sidecar. The other "
-           "exercises produce no machine-readable output at all, so the generator "
-           "reads a manifest and sidecars that nothing writes. Remove this marker "
-           "when the producing side lands; do not loosen it.",
+    reason="NARROWED 2026-08-05, not closed. company-overview, icp-prioritization, "
+           "positioning and tool-inventory now write sidecars, which is every "
+           "exercise the loader currently reads, so a real sprint CAN generate a "
+           "plan. The remaining six write nothing. Their payloads are defined and "
+           "unconsumed, so this is incompleteness rather than breakage. Remove this "
+           "marker when they land; do not loosen it.",
 )
 def test_every_exercise_instructs_writing_its_sidecar():
     """The contract is only real if something produces it.
@@ -84,12 +86,6 @@ def test_every_exercise_instructs_writing_its_sidecar():
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="KNOWN GAP 2026-08-05: the orchestrator reads the manifest as a backstop "
-           "but never creates it. An absent manifest is the exact state the "
-           "two-level design exists to make impossible.",
-)
 def test_orchestrator_creates_the_manifest():
     body = _skill_body("strategy-sprint")
     creates = re.search(r"creat\w*[^.]{0,80}sprint-manifest|sprint-manifest[^.]{0,80}creat\w*",

@@ -135,6 +135,19 @@ Update these files:
 
 Only add/update information — never remove existing content.
 
+## Step 7: Save the machine-readable sidecar
+
+After the client confirms, write **`${ARTIFACT_DIR}/output/positioning.yaml`** conforming to `schema/strategy_sprint_input.schema.json`. This is what the GTM plan generator reads. The markdown section above is for people; this file is for the pipeline, and the two are written from the same confirmed content rather than one being derived from the other later.
+
+The sidecar carries the envelope header (`schemaVersion`, `exerciseId: positioning`, `generatedAt`, `confirmedByClient`) plus the payload. **Set `confirmedByClient: false` if the client has not ratified it.** A downstream consumer halts on unconfirmed content deliberately; setting it true to keep things moving defeats the check and is worse than the delay it avoids.
+
+**Required in the payload: `statement`, carried VERBATIM.** It is the one sentence this exercise exists to produce, and the plan generator uses it as the value proposition headline. Do not paraphrase it into the sidecar, do not tighten it, and do not expand it: if the sentence needs changing, change it with the client and then record what you both agreed.
+
+`competitiveMap[].competitors[].name` is read downstream and merged with the competitor list from `/company-overview`. A competitor named in only one of the two still arrives, so there is no need to duplicate entries across both.
+
+Then update the manifest at `${ARTIFACT_DIR}/output/sprint-manifest.yaml`: set this step's `status` to `complete` and fill `completedAt`, or `status: failed` with a `failureReason` if you could not finish. **A step that ran and failed must say so rather than being left as `unrun`.** Those two states have different remedies and the manifest is the only place the difference survives.
+
+
 ## Related Exercises
 
 - **Depends on:** `/company-overview`, `/icp-prioritization`, `/marketing-advantages`, `/perceptions`

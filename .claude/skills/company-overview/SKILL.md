@@ -73,6 +73,7 @@ Compile everything into this format:
 | Field | Details |
 |-------|---------|
 | Company | [Name] |
+| Industry | [the client's own words for what industry they are in] |
 | URL | [website] |
 | Founded | [year] |
 | Stage | [funding stage] |
@@ -139,6 +140,21 @@ Update these files with relevant information from the exercise:
 2. **`${ARTIFACT_DIR}/input/client-brief.md`** — Enrich the business context section with research findings and metrics
 
 Only add/update information — never remove existing content from these files.
+
+## Step 7: Save the machine-readable sidecar
+
+After the client confirms, write **`${ARTIFACT_DIR}/output/company-overview.yaml`** conforming to `schema/strategy_sprint_input.schema.json`. This is what the GTM plan generator reads. The markdown section above is for people; this file is for the pipeline, and the two are written from the same confirmed content rather than one being derived from the other later.
+
+The sidecar carries the envelope header (`schemaVersion`, `exerciseId: company-overview`, `generatedAt`, `confirmedByClient`) plus the payload. **Set `confirmedByClient: false` if the client has not ratified it.** A downstream consumer halts on unconfirmed content deliberately; setting it true to keep things moving defeats the check and is worse than the delay it avoids.
+
+**Required in the payload: `company.name`, and at least one entry in `differentiators`.** Those are what this exercise exists to produce. Everything else is optional and nullable on purpose.
+
+Record `company.industry` from what the client actually told you. It is read directly by the plan generator and there is no other source for it in the sprint, so leaving it out means the generator halts. Do not infer it from `businessModel`: an inferred industry arrives in the same field, with the same type, as a stated one, and nothing downstream can tell them apart.
+
+Every metric is optional AND nullable, and `metrics.notProvided` should name the ones you asked about and the client declined. A client who will not share ARR is the normal case. A null alone cannot say whether the question was ever put.
+
+Then update the manifest at `${ARTIFACT_DIR}/output/sprint-manifest.yaml`: set this step's `status` to `complete` and fill `completedAt`, or `status: failed` with a `failureReason` if you could not finish. **A step that ran and failed must say so rather than being left as `unrun`.** Those two states have different remedies and the manifest is the only place the difference survives.
+
 
 ## Related Exercises
 
