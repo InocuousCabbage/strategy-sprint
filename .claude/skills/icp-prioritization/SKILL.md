@@ -38,6 +38,9 @@ The MKT1 framework uses four priority tiers:
 
 3. **Map the TAM (Total Addressable Market):**
    - Identify company-type segments (by industry, size, stage, geography)
+   - **Write down the target industries as an explicit list.** Not a paragraph. The list is
+     recorded in the sidecar and read directly downstream, and a prose TAM summary cannot be
+     turned into one later without someone guessing at where the boundaries were.
    - Identify role-based segments (who within those companies buys/uses)
 
 ## Step 2: Conversational Discovery
@@ -130,6 +133,21 @@ Update these files:
 1. **`${ARTIFACT_DIR}/output/icp.md`** — Update with priority tiers, maturity levels, time allocation per segment, deep-dive details
 
 Only add/update information — never remove existing content.
+
+## Step 7: Save the machine-readable sidecar
+
+After the client confirms, write **`${ARTIFACT_DIR}/output/icp-prioritization.yaml`** conforming to `schema/strategy_sprint_input.schema.json`. This is what the GTM plan generator reads. The markdown section above is for people; this file is for the pipeline, and the two are written from the same confirmed content rather than one being derived from the other later.
+
+The sidecar carries the envelope header (`schemaVersion`, `exerciseId: icp-prioritization`, `generatedAt`, `confirmedByClient`) plus the payload. **Set `confirmedByClient: false` if the client has not ratified it.** A downstream consumer halts on unconfirmed content deliberately; setting it true to keep things moving defeats the check and is worse than the delay it avoids.
+
+**Required in the payload: at least one entry in `tiers`.** Each tier carries `segment` and `priority`; `role` is the buyer's job title and is read directly by the plan generator, so a tier with no role contributes nothing downstream.
+
+Record `industries` as the list of target-market industries you established. The plan generator requires at least one and `tamOverview` cannot supply it: that field is deliberately undecomposed prose, and parsing an industry list out of a paragraph is inference wearing the shape of a stated fact.
+
+`segmentDeepDives[].painPoints` and `.decisionCriteria` are both read downstream. Carry the client's own words rather than tidying them into categories; the specific phrasing is what makes them usable later.
+
+Then update the manifest at `${ARTIFACT_DIR}/output/sprint-manifest.yaml`: set this step's `status` to `complete` and fill `completedAt`, or `status: failed` with a `failureReason` if you could not finish. **A step that ran and failed must say so rather than being left as `unrun`.** Those two states have different remedies and the manifest is the only place the difference survives.
+
 
 ## Related Exercises
 
