@@ -188,11 +188,28 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_GENERATOR_ERROR
 
     try:
-        generator = GTMPlanGenerator(sprint_input)
-        plan = generator.generate()
+        # Both of these calls were previously written against an API neither
+        # class has: GTMPlanGenerator(sprint_input).generate(), and
+        # PlanWriter(plan).write_json(path). Nothing ever reached this block,
+        # because the contract check above always failed first, so the wrong
+        # signatures sat here unexecuted. The generator's own docstring shows
+        # the real shape.
+        generator = GTMPlanGenerator()
+        plan = generator.generate(sprint_input, client_id=args.client_slug)
+
+        # PlanWriter is VENDORED and always writes to
+        # {base}/.state/{client_id}/gtm-plan/plan.json. The documented contract,
+        # in the Exercise 7 skill and the orchestrator's backstop check, is
+        # output/gtm-plan.json inside the artifact dir. Serialising here rather
+        # than editing PlanWriter, because a local edit to a vendored file is
+        # reverted by the next sync without anyone noticing.
+        #
+        # NOT WIRED, flagged rather than silently dropped: PlanWriter.write()
+        # also emits ten per-section JSON files and a human-readable PLAN.md.
+        # Those may well be worth having; nothing consumes them today.
         output_path = artifact_dir / "output" / "gtm-plan.json"
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        PlanWriter(plan).write_json(output_path)
+        output_path.write_text(json.dumps(plan.to_dict(), indent=2, default=str))
     except Exception as exc:  # noqa: BLE001
         ErrorEnvelope(
             kind="generator_error",

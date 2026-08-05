@@ -407,6 +407,13 @@
                   "null"
                 ]
               },
+              "industry": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Added 2026-08-05. The GTM generator requires an industry and no exercise produced one, so every plan run failed on a field nothing could supply. Stated here rather than inferred downstream from businessModel or companyType free text: a derived industry wearing the same type as a stated one is indistinguishable by the time anything consumes it."
+              },
               "founded": {
                 "type": [
                   "integer",
@@ -594,6 +601,14 @@
               "null"
             ],
             "description": "Prose. Not decomposed."
+          },
+          "industries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Added 2026-08-05, for the same reason as company.industry. The GTM generator requires at least one target-market industry. tamOverview is the nearest existing field and is deliberately undecomposed prose, so satisfying the requirement from it would mean parsing an industry list out of a paragraph. That is inference presented as a stated value. Optional: an exercise that did not establish industries records none rather than producing some."
           },
           "tiers": {
             "type": "array",
