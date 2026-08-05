@@ -1,0 +1,14 @@
+schemaVersion: 0.1.0
+exerciseId: company-overview
+order: 1
+generatedAt: '2026-08-05T14:30:00Z'
+clientSlug: test-client
+sourceSection: '## Company Overview'
+confirmedByClient: false
+payload:
+  company:
+    name: Acme Corp
+    url: https://acme.example
+  differentiators:
+  - claim: Only vendor with 24/7 on-site response
+    evidence: null
