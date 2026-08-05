@@ -108,7 +108,7 @@
     "sidecar": {
       "type": "object",
       "description": "Written to ${ARTIFACT_DIR}/output/<exercise-id>.yaml by each exercise alongside its markdown section. Header is fixed; payload is open at this schema version.",
-      "required": ["schemaVersion", "exerciseId", "generatedAt", "payload"],
+      "required": ["schemaVersion", "exerciseId", "generatedAt", "confirmedByClient", "payload"],
       "additionalProperties": false,
       "properties": {
         "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
@@ -122,7 +122,7 @@
         },
         "confirmedByClient": {
           "type": "boolean",
-          "description": "Every exercise pauses for client confirmation before saving. False means the content was drafted but not confirmed, which is a legitimate intermediate state and NOT the same as complete."
+          "description": "Every exercise pauses for client confirmation before saving. False means drafted but not confirmed, a legitimate intermediate state that is NOT the same as complete. REQUIRED, not optional: a consumer that rejects unconfirmed content cannot treat an absent field as a safe default, because absent would be ambiguous between not-confirmed and exercise-never-recorded-it. That is the same ambiguity the manifest exists to break, one field over, so it is closed the same way: by making the producer state it."
         },
         "payload": {
           "type": "object",
