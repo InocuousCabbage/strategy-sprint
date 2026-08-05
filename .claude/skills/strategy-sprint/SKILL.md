@@ -118,6 +118,27 @@ After a full sprint, the operator should be able to:
 3. Find one file per big-bet campaign in `output/campaigns/`.
 4. Find `output/brand-voice.md` with either the client's overrides or the defaults from `brand-voice/SKILL.md`.
 
+
+
+## Post-sprint GTM plan hash-check (backstop)
+
+Exercise 7 (channel-strategy) invokes `pipelines.gtm_generator.cli` as its final step; the manifest at `output/sprint-manifest.yaml` records completion. That is the primary path.
+
+The orchestrator ALSO runs a backstop verification after any full-sprint run and any re-run of an individual exercise:
+
+1. **Confirm `output/gtm-plan.json` exists.** If absent, Exercise 7 either was not run or failed silently. Re-invoke:
+   ```
+   python3 -m pipelines.gtm_generator.cli \
+     --artifact-dir artifacts/<client-slug> \
+     --client-slug <client-slug> \
+     --strict
+   ```
+2. **Confirm the recorded input hash matches a fresh hash of the sidecars the manifest points at.** The plan-writer stores an `input_hash` field in `gtm-plan.json` derived from the concatenated bytes of every sidecar's payload at generation time. Recompute it against the current sidecars; if it differs, an exercise was re-run after the plan was generated and the plan is stale. Re-invoke the generator with the same command as above.
+
+Why two triggers (Exercise 7 direct-invoke AND orchestrator hash-check): the first-order failure is Exercise 7 silently skipping the CLI call, which the hash-check catches. The second is a downstream user editing a sidecar after generation (a common iteration pattern) which staleness would otherwise mask. Both surface as re-invocation of the SAME command, so there is no two-code-paths-do-the-same-work drift.
+
+Fail-loud semantics of that command carry through: exit 2 or 3 is a real problem to fix upstream, not to swallow. Do NOT relax `--strict` to "get past" a re-run; the strict-only mode is the whole reason the plan is safe to hand to downstream automation.
+
 ## Related skills
 
 - Each of the 9 individual exercise skills at `.claude/skills/<exercise>/SKILL.md`, plus the `/tool-inventory` prerequisite.
