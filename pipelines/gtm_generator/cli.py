@@ -119,10 +119,8 @@ def main(argv: list[str] | None = None) -> int:
     # Deferred imports so a bad --artifact-dir fails fast before loading heavy
     # modules; also isolates any import-time error to the generator-error path.
     try:
-        from pipelines.gtm_generator.input_models import (
-            StrategySprintInput,
-            validate_strategy_input,
-        )
+        from pipelines.gtm_generator.input_models import validate_strategy_input
+        from pipelines.gtm_generator.loader import load_from_artifact_dir
         from pipelines.gtm_generator.generator import GTMPlanGenerator
         from pipelines.gtm_generator.plan_writer import PlanWriter
     except ImportError as exc:
@@ -144,18 +142,29 @@ def main(argv: list[str] | None = None) -> int:
     # per-exercise schema. Kept behind the try/except so ALL contract failures
     # exit 2, regardless of which validator raised.
     try:
-        sprint_input = StrategySprintInput.from_artifact_dir(
-            artifact_dir, client_slug=args.client_slug
+        sprint_input = load_from_artifact_dir(
+            artifact_dir, client_slug=args.client_slug, strict=True
         )
-        validate_strategy_input(sprint_input)  # cross-section semantic checks
+        # validate_strategy_input returns a list[str] of errors (vendored
+        # from the generator); empty means valid. cli.py earlier ignored
+        # the return value which silently accepted invalid input — fixed
+        # here to raise a ContractError-shaped exception when non-empty
+        # so the same exit-code path handles semantic + envelope failures.
+        semantic_errors = validate_strategy_input(sprint_input)
+        if semantic_errors:
+            from pipelines.gtm_generator.loader import ContractError
+
+            raise ContractError(
+                "Cross-section semantic validation failed: "
+                + "; ".join(semantic_errors)
+            )
     except Exception as exc:  # noqa: BLE001 — envelope classifies below
-        # Distinguish contract-violation exceptions (raised by validators +
-        # from_artifact_dir on bad input) from internal errors (raised by
-        # anything else). The vendored input_models raises TypedContractError
-        # subclasses for the former; anything else falls to the generator-error
-        # bucket. This split is why the exit codes matter: operator response
-        # differs (fix your input vs file a bug).
-        from pipelines.gtm_generator.input_models import ContractError
+        # Distinguish contract-violation exceptions (raised by the loader on
+        # any bad input) from internal errors (raised by anything else). The
+        # loader raises ContractError subclasses for the former; anything else
+        # falls to the generator-error bucket. This split is why the exit codes
+        # matter: operator response differs (fix your input vs file a bug).
+        from pipelines.gtm_generator.loader import ContractError
 
         if isinstance(exc, ContractError):
             ErrorEnvelope(

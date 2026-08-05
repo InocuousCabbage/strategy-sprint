@@ -1,0 +1,65 @@
+schemaVersion: 0.1.0
+clientSlug: test-client
+generatedAt: '2026-08-05T15:00:00Z'
+sprintComplete: false
+steps:
+- exerciseId: company-overview
+  order: 1
+  required: true
+  status: complete
+  sidecarPath: output/company-overview.yaml
+  completedAt: '2026-08-05T14:30:00Z'
+- exerciseId: icp-prioritization
+  order: 2
+  required: false
+  status: unrun
+  sidecarPath: output/icp-prioritization.yaml
+  completedAt: null
+- exerciseId: marketing-advantages
+  order: 3
+  required: false
+  status: unrun
+  sidecarPath: output/marketing-advantages.yaml
+  completedAt: null
+- exerciseId: perceptions
+  order: 4
+  required: false
+  status: unrun
+  sidecarPath: output/perceptions.yaml
+  completedAt: null
+- exerciseId: positioning
+  order: 5
+  required: true
+  status: unrun
+  sidecarPath: output/positioning.yaml
+  completedAt: null
+- exerciseId: revenue-levers
+  order: 6
+  required: false
+  status: unrun
+  sidecarPath: output/revenue-levers.yaml
+  completedAt: null
+- exerciseId: channel-strategy
+  order: 7
+  required: false
+  status: unrun
+  sidecarPath: output/channel-strategy.yaml
+  completedAt: null
+- exerciseId: big-bets
+  order: 8
+  required: false
+  status: unrun
+  sidecarPath: output/big-bets.yaml
+  completedAt: null
+- exerciseId: brand-voice
+  order: 9
+  required: false
+  status: unrun
+  sidecarPath: output/brand-voice.yaml
+  completedAt: null
+- exerciseId: tool-inventory
+  order: 10
+  required: false
+  status: unrun
+  sidecarPath: output/tool-inventory.yaml
+  completedAt: null
