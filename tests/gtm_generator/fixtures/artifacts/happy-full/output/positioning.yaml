@@ -1,0 +1,13 @@
+schemaVersion: "0.1.0"
+exerciseId: "positioning"
+order: 5
+generatedAt: "2026-08-05T14:30:00Z"
+clientSlug: "test-client"
+confirmedByClient: true
+payload:
+  statement: "For regional property managers who cannot absorb downtime, Acme Corp is the HVAC partner that answers at 2am."
+  competitiveMap:
+    - spectrum: "Response time vs price"
+      us: "Fastest, premium"
+      competitors:
+        - name: "Globex Mechanical"

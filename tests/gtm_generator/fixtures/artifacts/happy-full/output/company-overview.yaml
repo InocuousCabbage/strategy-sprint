@@ -1,0 +1,17 @@
+schemaVersion: "0.1.0"
+exerciseId: "company-overview"
+order: 1
+generatedAt: "2026-08-05T14:30:00Z"
+clientSlug: "test-client"
+confirmedByClient: true
+payload:
+  company:
+    name: "Acme Corp"
+    url: "https://acme.example"
+    industry: "Commercial HVAC services"
+  differentiators:
+    - claim: "Only vendor with 24/7 on-site response"
+      evidence: null
+  competitors:
+    - name: "Globex Mechanical"
+      howTheyDiffer: "Cheaper, no after-hours coverage"

@@ -364,24 +364,77 @@ def _payloads_to_input(
     industry = str(company.get("industry", "") or "")
     website = str(company.get("url", "") or "")
 
+    # TRANSLATION LAYER. The sprint speaks the exercises' vocabulary and the
+    # generator speaks GTM vocabulary, and until 2026-08-05 this function read
+    # GTM key names straight out of sprint payloads. Those keys are not merely
+    # absent, they are forbidden: the payload schemas are additionalProperties
+    # false, so no exercise could ever have supplied them. Seven of ten reads
+    # were unsatisfiable and the pipeline had never produced a plan from any
+    # input, including this repo's own fixture. Both halves passed their own
+    # suites throughout, because each side's fixtures were written by that side.
+    #
+    # Everything below maps from a field an exercise actually produces. Where
+    # no such field existed, the fix was to add one to the payload schema so a
+    # human states it, NOT to derive it here. A value inferred from free text
+    # arrives wearing the same type as a stated one and nothing downstream can
+    # tell them apart.
     icp_payload = payload("icp-prioritization")
-    target_market = TargetMarket.from_dict(icp_payload.get("target_market", {}))
-    icp = ICPDefinition.from_dict(icp_payload.get("icp", {}))
+    tiers = icp_payload.get("tiers") or []
+    deep_dives = icp_payload.get("segmentDeepDives") or []
 
-    positioning_payload = payload("positioning")
-    value_proposition = ValueProposition.from_dict(
-        positioning_payload.get("value_proposition", {})
+    target_market = TargetMarket(
+        industries=[str(i) for i in (icp_payload.get("industries") or []) if i],
+    )
+    icp = ICPDefinition(
+        # tiers[].role is the exercise's word for the buyer. Empty roles are
+        # dropped rather than carried as "": a tier that named no role did not
+        # name one, and a blank string would satisfy the generator's non-empty
+        # check while telling a reader nothing.
+        titles=[str(t.get("role")) for t in tiers if t.get("role")],
+        criteria=[str(c) for d in deep_dives for c in (d.get("decisionCriteria") or []) if c],
     )
 
-    perceptions_payload = payload("perceptions")
-    competitive_landscape = [
-        Competitor.from_dict(c)
-        for c in perceptions_payload.get("competitive_landscape", []) or []
-    ]
-    pain_points = list(perceptions_payload.get("pain_points", []) or [])
+    # positioning.statement is described by the schema as the one sentence the
+    # exercise exists to produce, which is exactly what a headline is.
+    positioning_payload = payload("positioning")
+    value_proposition = ValueProposition(
+        headline=str(positioning_payload.get("statement", "") or ""),
+    )
 
-    revenue_payload = payload("revenue-levers")
-    pricing_context = PricingContext.from_dict(revenue_payload.get("pricing_context", {}))
+    # Competitors are named in two exercises and neither is authoritative alone:
+    # company-overview lists who they are, positioning places them on spectrums.
+    # Merged by name, first mention wins, so a competitor named in only one
+    # place still arrives.
+    seen: dict[str, Competitor] = {}
+    for c in payload("company-overview").get("competitors") or []:
+        name = str(c.get("name", "") or "").strip()
+        if name and name not in seen:
+            seen[name] = Competitor(name=name, weakness=str(c.get("howTheyDiffer", "") or ""))
+    for row in positioning_payload.get("competitiveMap") or []:
+        for c in row.get("competitors") or []:
+            name = str(c.get("name", "") or "").strip()
+            if name and name not in seen:
+                seen[name] = Competitor(name=name)
+    competitive_landscape = list(seen.values())
+
+    pain_points = [
+        str(p) for d in deep_dives for p in (d.get("painPoints") or []) if p
+    ]
+
+    # pricing_context has NO sprint source. revenue-levers defines rankedLevers
+    # and leverByIcp; nothing anywhere states a pricing model, range or posture
+    # in the shape PricingContext wants. The dead read that used to live here
+    # (revenue_payload.get("pricing_context")) could never return anything, and
+    # a read that cannot be satisfied is worse than an absent one: it reads as
+    # wired.
+    #
+    # Deliberately NOT sourced from company-overview.company.pricing, which is
+    # free text and explicitly documented as not reducing to structure.
+    # Splitting a sentence into model/range/positioning is inference, and the
+    # generator treats pricing_context as optional, so nothing is lost by
+    # leaving it at defaults. If a plan ever needs it, the fix is a stated field
+    # on revenue-levers, not a parser here.
+    pricing_context = PricingContext()
 
     brand_voice_payload = payload("brand-voice")
     brand_voice = BrandVoice.from_dict(brand_voice_payload)

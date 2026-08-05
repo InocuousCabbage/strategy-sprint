@@ -154,21 +154,17 @@ def _reachable(spec, path):
     return True
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="KNOWN GAP 2026-08-05: the loader reads snake_case GTM keys "
-           "(target_market, icp, value_proposition, competitive_landscape, "
-           "company.industry) that the camelCase payload schemas do not define and, "
-           "being additionalProperties:false, actively forbid. The two halves were "
-           "designed to different vocabularies and never reconciled. This is why a "
-           "schema-valid artifact cannot generate a plan.",
-)
 def test_every_payload_key_the_loader_reads_is_reachable_under_the_schema():
     """The seam that no fixture can test.
 
     Both sides pass their own suites while disagreeing, because each side's
     fixtures were written by that side. Only a comparison of the two artifacts
     catches it.
+
+    This began as xfail(strict=True) describing seven unsatisfiable reads. The
+    translation layer in the same PR closed them, the marker became an
+    unexpected pass, and the suite failed until it was removed. That is the
+    intended lifecycle: the marker cannot outlive the gap it documents.
     """
     unreachable = []
     for exercise_id, path in _loader_payload_reads():

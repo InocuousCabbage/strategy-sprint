@@ -1,0 +1,23 @@
+schemaVersion: "0.1.0"
+exerciseId: "icp-prioritization"
+order: 2
+generatedAt: "2026-08-05T14:30:00Z"
+clientSlug: "test-client"
+confirmedByClient: true
+payload:
+  industries:
+    - "Commercial real estate"
+    - "Light manufacturing"
+  tiers:
+    - priority: "Core"
+      segment: "Regional property managers"
+      role: "Director of Facilities"
+      companyType: "Commercial real estate"
+      resourceAllocationPct: 60
+      maturity: "Proven"
+  segmentDeepDives:
+    - segment: "Regional property managers"
+      painPoints:
+        - "Emergency downtime costs more than the repair"
+      decisionCriteria:
+        - "Guaranteed response time"
