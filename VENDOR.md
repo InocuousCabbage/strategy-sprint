@@ -62,38 +62,16 @@ generated GTM plans.
 
 ## Copy-up gate (run before every commit that includes a sync)
 
-The copy-up gate verifies no private terms slipped through in the diff
-before the sync is committed to this public repo.
+Run before any commit that moves content from a private repo into this
+one:
 
-**Automation state (accurate as of 2026-08-05):** the gate is NOT
-automated as a runnable script yet. Before any commit that vendors or
-re-syncs content from a private upstream into this repo, ask the
-canonical gate-runner to sweep the staged diff manually. A runnable
-script is planned at the copy-audit-stack repo
-(InocuousCabbage/copy-audit-stack); when it lands, this section
-becomes a pointer to it and this manual step goes away.
+    python3 path/to/private_scan.py --terms <your-team's-canonical-list>
 
-**Why the enumeration doesn't live here:** the private-terms list has
-to live in exactly one place. Restating it in every consuming repo
-guarantees drift as new client names are added over time. When the
-runnable script exists, the enumeration will live in the scanner's
-own `data/` directory and every repo that pulls the script picks up
-the same enumeration.
-
-**What to expect from a sweep, whether manual or scripted:**
-
-- Scan runs against the **added lines** of the staged diff (not the
-  whole file), so pre-existing exposure doesn't drown the signal on
-  its first run in an established repo.
-- Positive-control fixture must fire on all gates before a clean run
-  is trusted. A "clean" report with no positive control is exactly
-  the false-green pattern the scan exists to prevent.
-- If a gate fires, either (a) the added content is genuinely private
-  and should not go public (fix at source or leave unstaged), or (b)
-  the enumeration incorrectly flags a legitimate term (file an issue
-  at the scanner repo — do NOT silence the gate locally, since a
-  locally-silenced gate is how canonical-drift-with-different-numbers
-  starts).
+Exits 1 on any error. The tool lives at
+InocuousCabbage/copy-audit-stack (`scripts/private_scan.py`). The
+terms list is NOT in this repo and must not be: an enumeration of
+what you must not publish is itself a thing you must not publish.
+See the scanner's `data/private-terms.example.txt` for the format.
 
 ## Sync changelog
 

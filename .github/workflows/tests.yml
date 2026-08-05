@@ -1,0 +1,31 @@
+name: tests
+
+# Runs the strategy-sprint test suite on every push and pull-request against
+# main. Deliberately minimal — pip + pytest, no external network calls at
+# test time (all fixtures live in-tree).
+#
+# See VENDOR.md for the vendored gtm_generator sync procedure and the
+# copy-up private-data gate; the gate runs pre-commit locally, not here,
+# because the private-terms enumeration itself is not (and should not be)
+# in this repo.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run pytest
+        run: pytest tests/ -v

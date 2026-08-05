@@ -211,6 +211,31 @@ A campaign whose Engine names a Deprioritized channel is a contradiction between
 
 ---
 
+## Generating the GTM plan
+
+Once the sidecar is written and the manifest updated, generate the plan:
+
+```
+python3 -m pipelines.gtm_generator.cli \
+  --artifact-dir ${ARTIFACT_DIR} \
+  --client-slug <client-slug> \
+  --strict
+```
+
+Read the exit code of that command, not of anything you pipe it into.
+
+| Exit | Meaning | What to do |
+|---|---|---|
+| 0 | Plan written to `gtm-plan.json` | Done. |
+| 2 | Contract violation | Something upstream is not ready. A missing or invalid manifest, a required exercise unrun or failed, a missing or invalid sidecar, an unconfirmed payload, and others. The list is indicative, not exhaustive: the structured envelope on stderr names the specific error, so read that rather than guessing from this table. Fix upstream and re-run; do NOT relax `--strict`. |
+| 3 | Generator internal error | A defect in the generator rather than in your data. Structured envelope on stderr. Report it rather than working around it. |
+
+**Run it with `--strict` and leave it there.** The plan is acted on downstream by outreach automation and CRM configuration, so generating from unratified or malformed content puts real systems to work on content nobody approved. An exit 2 is the system telling you something upstream is not finished, and the fix is upstream every time.
+
+**Exit 2 is the normal way to discover that an earlier exercise is not finished.** It is not a bug in the invocation; the sprint state is not ready. If it fires, read the envelope, go to the exercise it names, and finish it. That is work rather than a flag to toggle.
+
+---
+
 ## Re-evaluation Triggers
 
 Re-run this exercise when:
