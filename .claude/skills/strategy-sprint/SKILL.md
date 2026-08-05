@@ -1,6 +1,6 @@
 ---
 name: strategy-sprint
-description: "Top-level Strategy Sprint orchestrator. Runs an 8-skill marketing strategy sprint against a per-client artifact folder — company-overview, ICP prioritization, marketing advantages, perceptions, positioning, revenue levers, big-bet campaigns, and brand voice. Reads client input from artifacts/<client>/input/, produces strategy sections in artifacts/<client>/output/. Standalone + portable."
+description: "Top-level Strategy Sprint orchestrator. Runs an 8-skill marketing strategy sprint against a per-client artifact folder: company-overview, ICP prioritization, marketing advantages, perceptions, positioning, revenue levers, big-bet campaigns, and brand voice. Reads client input from artifacts/<client>/input/, produces strategy sections in artifacts/<client>/output/. Standalone + portable."
 metadata:
   version: 1.0.0
 ---
