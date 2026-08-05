@@ -4,14 +4,15 @@
   "title": "Strategy Sprint machine-readable output",
   "description": "The typed contract between a Strategy Sprint run and any program that consumes it. Each exercise writes a human markdown section AND a machine sidecar; this schema governs the sidecars and the run manifest that indexes them. ENVELOPE ONLY at this version: per-exercise payload shapes land additively under $defs/payloads and cannot break a consumer written against the envelope.",
   "$comment": "Version 0.1.0, 2026-08-05. Envelope is stable; payloads are not yet defined.",
-
   "oneOf": [
-    { "$ref": "#/$defs/manifest" },
-    { "$ref": "#/$defs/sidecar" }
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/sidecar"
+    }
   ],
-
   "$defs": {
-
     "exerciseId": {
       "description": "Stable identifier for a sprint step. Matches the skill directory name so the id, the slash command, and the sidecar filename never drift apart.",
       "enum": [
@@ -27,25 +28,37 @@
         "tool-inventory"
       ]
     },
-
     "completionStatus": {
       "description": "Operator-visible state of one step. Load-bearing: a missing sidecar alone is ambiguous between never-ran, ran-and-failed-to-write, and wrote-to-the-wrong-path, and those want different remediation. Recording status OUTSIDE the sidecar is what makes them separable.",
-      "enum": ["unrun", "complete", "failed"]
+      "enum": [
+        "unrun",
+        "complete",
+        "failed"
+      ]
     },
-
     "manifest": {
       "type": "object",
       "description": "Written to ${ARTIFACT_DIR}/output/sprint-manifest.yaml. THE ENTRY POINT: a consumer reads this first, then resolves sidecars from it. It exists because completion status cannot live only in the sidecar. A sidecar that is missing cannot tell you it was expected, so 'complete but absent' would be indistinguishable from 'never ran' and the three-way distinction would collapse back to two. The manifest is the thing that survives a sidecar that was never written.",
-      "required": ["schemaVersion", "clientSlug", "generatedAt", "steps"],
+      "required": [
+        "schemaVersion",
+        "clientSlug",
+        "generatedAt",
+        "steps"
+      ],
       "additionalProperties": false,
       "properties": {
-        "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
+        "schemaVersion": {
+          "$ref": "#/$defs/schemaVersion"
+        },
         "clientSlug": {
           "type": "string",
           "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
           "description": "Matches the artifacts/<client-slug>/ directory name."
         },
-        "generatedAt": { "type": "string", "format": "date-time" },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
         "sprintComplete": {
           "type": "boolean",
           "description": "True only when every step with required=true has status 'complete'. Denormalized on purpose so a consumer can reject an unfinished run without walking the step list."
@@ -54,17 +67,25 @@
           "type": "array",
           "minItems": 1,
           "description": "One entry per sprint step, in execution order. Present for EVERY step including unrun ones: an absent entry means the manifest is stale, which is itself a defect worth raising rather than silently treating as unrun.",
-          "items": { "$ref": "#/$defs/manifestStep" }
+          "items": {
+            "$ref": "#/$defs/manifestStep"
+          }
         }
       }
     },
-
     "manifestStep": {
       "type": "object",
-      "required": ["exerciseId", "order", "status", "sidecarPath"],
+      "required": [
+        "exerciseId",
+        "order",
+        "status",
+        "sidecarPath"
+      ],
       "additionalProperties": false,
       "properties": {
-        "exerciseId": { "$ref": "#/$defs/exerciseId" },
+        "exerciseId": {
+          "$ref": "#/$defs/exerciseId"
+        },
         "order": {
           "type": "integer",
           "minimum": 1,
@@ -75,47 +96,107 @@
           "default": true,
           "description": "False for optional steps. An optional step left unrun does not make the sprint incomplete."
         },
-        "status": { "$ref": "#/$defs/completionStatus" },
+        "status": {
+          "$ref": "#/$defs/completionStatus"
+        },
         "sidecarPath": {
           "type": "string",
           "description": "Path relative to ${ARTIFACT_DIR}, e.g. output/positioning.yaml. Recorded rather than derived so a consumer never has to reconstruct a filename convention, and so a step that legitimately writes somewhere else stays loadable.",
           "pattern": "^output/[a-z0-9-]+\\.yaml$"
         },
         "completedAt": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time",
           "description": "Null unless status is 'complete'."
         },
         "failureReason": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Set when status is 'failed'. Free text for a human; a consumer should surface it rather than parse it."
         }
       },
       "allOf": [
         {
           "$comment": "A failed step must say why. A status with no diagnosis pushes the investigation onto whoever finds it later, which is the expensive moment.",
-          "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
-          "then": { "required": ["failureReason"], "properties": { "failureReason": { "type": "string", "minLength": 1 } } }
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "failureReason"
+            ],
+            "properties": {
+              "failureReason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         },
         {
           "$comment": "An unrun step has nothing to timestamp. Guarding this direction too, so a stale completedAt cannot survive a re-set to unrun.",
-          "if": { "properties": { "status": { "const": "unrun" } }, "required": ["status"] },
-          "then": { "properties": { "completedAt": { "const": null } } }
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unrun"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "completedAt": {
+                "const": null
+              }
+            }
+          }
         }
       ]
     },
-
     "sidecar": {
       "type": "object",
       "description": "Written to ${ARTIFACT_DIR}/output/<exercise-id>.yaml by each exercise alongside its markdown section. Header is fixed; payload is open at this schema version.",
-      "required": ["schemaVersion", "exerciseId", "generatedAt", "confirmedByClient", "payload"],
+      "required": [
+        "schemaVersion",
+        "exerciseId",
+        "generatedAt",
+        "confirmedByClient",
+        "payload"
+      ],
       "additionalProperties": false,
       "properties": {
-        "schemaVersion": { "$ref": "#/$defs/schemaVersion" },
-        "exerciseId": { "$ref": "#/$defs/exerciseId" },
-        "order": { "type": "integer", "minimum": 1 },
-        "generatedAt": { "type": "string", "format": "date-time" },
-        "clientSlug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "schemaVersion": {
+          "$ref": "#/$defs/schemaVersion"
+        },
+        "exerciseId": {
+          "$ref": "#/$defs/exerciseId"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "clientSlug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
         "sourceSection": {
           "type": "string",
           "description": "The heading in marketing-strategy.md this sidecar mirrors, e.g. '## Channel Strategy'. Lets a consumer point a human at the prose behind a machine value."
@@ -129,17 +210,236 @@
           "description": "Exercise-specific content. OPEN at schema version 0.1.0: no properties are constrained yet. Per-exercise definitions land under $defs/payloads and are attached here by a future conditional block. Because this starts open and closes later, a consumer written against the envelope today keeps working: added payload constraints reject malformed NEW data, they do not change the envelope's shape.",
           "minProperties": 1
         }
-      }
+      },
+      "allOf": [
+        {
+          "$comment": "Attach a payload schema once one exists for that exercise. An exercise with no definition yet keeps the open payload from 0.1.0, so adding definitions never breaks a consumer.",
+          "if": {
+            "properties": {
+              "exerciseId": {
+                "const": "company-overview"
+              }
+            },
+            "required": [
+              "exerciseId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "$ref": "#/$defs/payloads/company-overview"
+              }
+            }
+          }
+        }
+      ]
     },
-
     "schemaVersion": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
       "description": "Semver of THIS schema, not of the sprint. A consumer should reject a major it does not know rather than guess."
     },
-
     "payloads": {
-      "$comment": "Deliberately empty at 0.1.0. Each exercise's payload schema lands here as an additive change: new $defs entry plus one clause attaching it to sidecar.payload when exerciseId matches. Landing them additively is the whole reason the envelope shipped first, so that loader work could proceed against a contract that will not move while these are still being derived."
+      "$comment": "One definition per exercise, attached to sidecar.payload by the conditional in $defs/sidecar/allOf. Landing them additively is why the envelope shipped first. PATTERN, follow it for the remaining seven: derive fields from that exercise's own 'Step 3: Document' output block, keep every field OPTIONAL except the one or two the exercise exists to produce, and allow null with a stated reason rather than forcing a value the client did not give. A schema that forces completeness turns 'they would not tell us' into a fabricated number.",
+      "company-overview": {
+        "type": "object",
+        "description": "Exercise 1. Mirrors the Company Snapshot, Key Metrics, Key Differentiators, Recent Momentum, Current Challenges and Competitive Landscape blocks.",
+        "required": [
+          "company",
+          "differentiators"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "company": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "founded": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1800
+              },
+              "stage": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "teamSize": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "businessModel": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "pricing": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Free text. Pricing structures do not reduce to a number and forcing one loses the structure."
+              }
+            }
+          },
+          "productOverview": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The 2-3 paragraph prose block, carried verbatim. Not decomposed: it is written for a human and any split would be this schema inventing structure the exercise never asked for."
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Every metric is optional AND nullable. A client who will not share ARR is the normal case, and a schema that forces the field invites an estimate presented as a figure.",
+            "properties": {
+              "arr": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "mrr": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[A-Z]{3}$"
+              },
+              "customers": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "growthRatePct": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "nrrPct": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "cac": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "ltv": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "monthlyOpex": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "notProvided": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Metric names the client declined or could not supply. EXPLICIT, because a null field alone cannot say whether it was asked. Same reason the run manifest exists."
+              }
+            }
+          },
+          "differentiators": {
+            "type": "array",
+            "minItems": 1,
+            "description": "The exercise exists to produce these, so at least one is required.",
+            "items": {
+              "type": "object",
+              "required": [
+                "claim"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "claim": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "The skill asks for evidence per differentiator. Nullable so an unevidenced claim is recorded AS unevidenced rather than dropped or invented."
+                }
+              }
+            }
+          },
+          "recentMomentum": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "currentChallenges": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "competitors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "howTheyDiffer": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
