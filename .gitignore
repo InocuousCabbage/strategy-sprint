@@ -1,3 +1,14 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Real client sprint artifacts must never enter this public repo. They name real
+# third-party firms. Ben, 2026-08-06: "They should not be committed to the public
+# repo." Destination is the Drive Lever Org tree, not this working directory.
+#
+# The two committed fixture dirs are re-included below: they are the repo's own
+# worked examples and contain no real client data (verified 2026-08-06 against
+# the third-party names in the live sprint).
+artifacts/*
+!artifacts/example-client/
+!artifacts/test-client/
