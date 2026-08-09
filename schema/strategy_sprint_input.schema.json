@@ -913,13 +913,15 @@
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "description": "SELF-DESCRIPTION, not world-state. Holds how the company currently POSITIONS itself, per the exercise question 'How would you describe your positioning today'. The answers are the company's own claims (current category/framing, current key benefit, current proof points), NOT observations about the market. Do not audit external artifacts such as site copy against this field: the copy is one expression of the same positioning, so the check is circular. 'today' is a SOURCE qualifier that reads like a TIME qualifier."
                 },
                 "inTwelveMonths": {
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "description": "SELF-DESCRIPTION of an intended future position, not a forecast about the world. Same source-qualifier caveat as 'today'."
                 }
               }
             }
