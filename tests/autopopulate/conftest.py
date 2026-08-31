@@ -306,3 +306,100 @@ def tree_hashes(root):
         if f.is_file():
             out[str(f.relative_to(root))] = hashlib.sha256(f.read_bytes()).hexdigest()
     return out
+
+
+@pytest.fixture
+def make_docx_with_toc_cache(tmp_path):
+    """A docx shaped like the real Annual Planning doc: a Heading 2 carrying the
+    token, plus a Table of Contents whose CACHED entry repeats that heading text.
+
+    Word stores the TOC as a block-level w:sdt; its entries live in w:sdtContent,
+    which is NOT a direct child of w:body — so a walk over doc.paragraphs misses it
+    entirely and leaves a visible literal token in the deliverable.
+    """
+    from docx import Document
+    from docx.oxml import parse_xml
+    from docx.oxml.ns import nsdecls
+
+    def _make(token: str = "[COMPANY]") -> str:
+        doc = Document()
+        toc = (
+            f'<w:sdt {nsdecls("w")}>'
+            "<w:sdtPr><w:docPartObj>"
+            '<w:docPartGallery w:val="Table of Contents"/>'
+            "</w:docPartObj></w:sdtPr>"
+            "<w:sdtContent>"
+            '<w:p><w:hyperlink w:anchor="_Toc1"><w:r>'
+            f'<w:t xml:space="preserve">Vision and strategy 2025: How {token} '
+            "wins with marketing\t1</w:t>"
+            "</w:r></w:hyperlink></w:p>"
+            "</w:sdtContent></w:sdt>"
+        )
+        doc.element.body.insert(0, parse_xml(toc))
+        doc.add_heading(f"Vision and strategy 2025: How {token} wins with marketing", level=2)
+        out = tmp_path / "toc.docx"
+        doc.save(out)
+        return str(out)
+
+    return _make
+
+
+@pytest.fixture
+def make_docx_with_field_instruction(tmp_path):
+    """A docx with the token inside a w:instrText field instruction.
+
+    run.text only reads w:t, so this is genuinely unreachable by the fill engine.
+    It exists to prove the residual GUARANTEE: what cannot be filled must be reported.
+    """
+    from docx import Document
+    from docx.oxml import parse_xml
+    from docx.oxml.ns import nsdecls
+
+    def _make(token: str = "[COMPANY]") -> str:
+        doc = Document()
+        doc.add_paragraph().add_run("nothing to fill here")
+        field = (
+            f'<w:p {nsdecls("w")}>'
+            '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+            f'<w:r><w:instrText xml:space="preserve"> HYPERLINK "http://{token}.example" '
+            "</w:instrText></w:r>"
+            '<w:r><w:fldChar w:fldCharType="end"/></w:r>'
+            "</w:p>"
+        )
+        doc.element.body.append(parse_xml(field))
+        out = tmp_path / "field.docx"
+        doc.save(out)
+        return str(out)
+
+    return _make
+
+
+@pytest.fixture
+def make_docx_with_textbox_token(tmp_path):
+    """A docx with the token inside a TEXT BOX (w:txbxContent).
+
+    Deliberately a DIFFERENT container from the TOC's w:sdtContent. The fill engine
+    does not traverse it, which is the point: it is the probe for the general
+    output-scan guarantee, not for any one traversal. Tomorrow's container
+    (SmartArt, a comment, an embedded object) behaves the same way.
+    """
+    from docx import Document
+    from docx.oxml import parse_xml
+    from docx.oxml.ns import nsdecls
+
+    def _make(token: str = "[COMPANY]") -> str:
+        doc = Document()
+        doc.add_paragraph().add_run("body text with no token")
+        box = (
+            f'<w:p {nsdecls("w")}>'
+            "<w:r><w:pict><w:shape><w:txbxContent>"
+            f'<w:p><w:r><w:t xml:space="preserve">Callout: {token} at a glance</w:t>'
+            "</w:r></w:p>"
+            "</w:txbxContent></w:shape></w:pict></w:r></w:p>"
+        )
+        doc.element.body.append(parse_xml(box))
+        out = tmp_path / "textbox.docx"
+        doc.save(out)
+        return str(out)
+
+    return _make

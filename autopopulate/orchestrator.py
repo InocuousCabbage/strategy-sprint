@@ -22,6 +22,7 @@ from pathlib import Path
 from autopopulate.engines.docx import (
     fill_docx_token_counts,
     fill_docx_under_heading,
+    residual_docx_tokens,
     set_docx_dropdown,
 )
 from autopopulate.engines.xlsx import fill_xlsx
@@ -59,6 +60,18 @@ def _apply_spec(copy_path: Path, spec: FileFillSpec) -> tuple[int, list[str]]:
                     warnings.append(
                         f"{spec.template}: left token {t.dest!r} unfilled — the token "
                         f"does not appear in the template (source {t.source!r})"
+                    )
+            # PRIMARY GUARANTEE: scan the FINISHED file, every xml part, for any
+            # token literal still present. The paragraph tree is what missed the TOC
+            # cache and would miss the next container too (a text box, SmartArt, a
+            # comment). Whatever we could not reach, the consultant is told about.
+            for token, left in residual_docx_tokens(copy_path, tokens).items():
+                if left:
+                    warnings.append(
+                        f"{spec.template}: {left} literal occurrence(s) of {token!r} "
+                        f"remain in the finished file — the fill could not reach them "
+                        f"(they sit in a container such as a text box, field code or "
+                        f"embedded object). Open the file and replace them by hand."
                     )
 
     elif spec.engine == "docx-heading":
