@@ -1,0 +1,78 @@
+# Strategy Sprint auto-populate fill-map.
+#
+# DATA, not code. Top-level keys are exercise ids (matching sprint-manifest.yaml
+# rows and the sidecar `exerciseId`). Each maps to a list of file entries:
+#
+#   template: path RELATIVE to templates_root, exactly as it appears in the
+#             routing table (.build/MAPPING.md)
+#   engine:   docx-token | docx-heading | docx-dropdown | xlsx | pptx
+#   sheet:    required for engine `xlsx`
+#   targets:  each names a `source` (dotted path into the sidecar payload;
+#             numeric segments index lists) and ONE destination key matching the
+#             engine: token / heading / alias / cell. Optional `join` is the only
+#             sanctioned way to flatten a list — without it a list value is a
+#             reported skip, never a guessed string.
+#
+# MVP scope (Ben-ruled): only the covered subset the sprint actually sources.
+# Everything else in the 37-file routing table is copied as-is and flagged.
+# EXTENDING COVERAGE = adding entries here. No new code unless a template needs
+# a genuinely new engine mode.
+
+company-overview:
+  - template: "3. Planning/3.3. Annual Planning/Annual Planning TEMPLATE.docx"
+    engine: docx-token
+    targets:
+      - source: company.name
+        token: "[COMPANY]"
+
+positioning:
+  - template: "1. Foundations/1.2. Product Marketing Research/1.2.3. Product-Service/Positioning statement TEMPLATE.docx"
+    engine: docx-heading
+    targets:
+      # Verbatim from the template: the heading is ALL-CAPS "POSITIONING STATEMENT"
+      # (Heading 1), with the blank paragraph directly beneath it.
+      - source: statement
+        heading: "POSITIONING STATEMENT"
+  - template: "1. Foundations/1.2. Product Marketing Research/1.2.3. Product-Service/Positioning statement TEMPLATE.docx"
+    engine: docx-dropdown
+    # The template's two real Word dropdown content controls. The sprint does not
+    # source these fields yet, so today they are REPORTED skips, not fabrications.
+    targets:
+      - source: productType
+        alias: "Product Type"
+      - source: comparator
+        alias: "Comparator"
+
+icp-prioritization:
+  - template: "1. Foundations/1.2. Product Marketing Research/1.2.1. Audience/Audience mapping (TAM definition & ICP prioritization) TEMPLATE.xlsx"
+    engine: xlsx
+    # Sheet "TAM segments": column A holds the row labels, B holds instructional
+    # examples, and columns C..J are the empty SEGMENT 1..8 fill columns. Segment N
+    # is POSITIONAL, so tiers.0 -> column C is safe: there is no way for the value
+    # to land under a label that contradicts it.
+    #
+    # NOT mapped, deliberately: sheet "Current ICP focus" rows 3-7 are keyed BY
+    # PRIORITY ("Core ", "Core ", "Scaling", "Testing", "Not a Priority"). A static
+    # tiers.0 -> row 3 mapping would silently file a Scaling tier under a Core row —
+    # right-looking cell, wrong content. That needs a label-scan target kind, not a
+    # coordinate. See the fill-map notes in the build report.
+    sheet: "TAM segments"
+    targets:
+      - source: tiers.0.segment
+        cell: "C3"   # Segment name
+      - source: tiers.0.priority
+        cell: "C4"   # Priority level — carries a list validation on C4:J4
+      - source: industries
+        cell: "C5"   # Industry/vertical
+        join: ", "
+
+# marketing-advantages is deliberately NOT mapped for the MVP.
+#
+# "Marketing Advantages EXERCISE.xlsx" has two sheets. "Advantages" is a fully
+# pre-filled reference catalogue (rows 2-37, 28 merged ranges) — writing into it
+# would destroy template content, not fill a blank. The blank one is "Advantages
+# Checklist  Exercise" (note the double space), whose rows are a FIXED catalogue of
+# advantage types; matching a sidecar advantage to its row needs a label scan, and
+# there is no marketing-advantages payload shape defined at schemaVersion 0.1.0 to
+# scan against. So the file is copied as-is and flagged, which is the honest
+# outcome. Mapping it blind would have been fabrication.
